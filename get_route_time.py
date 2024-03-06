@@ -71,9 +71,25 @@ class RouteUtil:
 		return None
 
 
+class ExecUtil:
+	@staticmethod
+	def _getOpen():
+		result = "open"
+		if sys.platform.startswith('win'):
+			result = "start"
+		return result
+
+	@staticmethod
+	def open(arg):
+		exec_cmd = f'{ExecUtil._getOpen()} "{arg}"'
+		result = subprocess.run(exec_cmd, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+		return result
+
+
 if __name__=="__main__":
 	parser = argparse.ArgumentParser(description='Specify start_latitude start_logtitude dest_latitude dest_logtitude e.g. 35.681236 139.767125 35.6759323 139.7450316')
 	parser.add_argument('args', nargs='*', help='')
+	parser.add_argument('-o', '--openUrl', action='store_true', default=False, help='specify if you want to open the url')
 
 	args = parser.parse_args()
 
@@ -82,6 +98,8 @@ if __name__=="__main__":
 	if len(loc)==4:
 		directions_link = RouteUtil.generate_directions_link(loc[0], loc[1], loc[2], loc[3])
 		print(directions_link)
+		if args.openUrl:
+			ExecUtil.open(directions_link)
 
 		driver = WebUtil.get_web_driver()
 		duration = RouteUtil.get_directions_duration(driver, directions_link)
