@@ -70,6 +70,20 @@ class RouteUtil:
 
 		return None
 
+	@staticmethod
+	def get_directions_duration_minutes(driver, lat1, lon1, lat2, lon2):
+		result = 0
+		url = RouteUtil.generate_directions_link(lat1, lon1, lat2, lon2)
+		duration = RouteUtil.get_directions_duration(driver, url)
+
+		if duration:
+			pos1 = duration.find("時間")
+			pos2 = duration.find("分")
+			if pos1!=-1 and pos2!=-1:
+				result = int( duration[0:pos1].strip() ) * 60 + int( duration[pos1+2:pos2].strip() )
+
+		return result, url
+
 
 class ExecUtil:
 	@staticmethod
